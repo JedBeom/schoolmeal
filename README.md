@@ -25,7 +25,7 @@ func main() {
         Zone:           sm.Jeonnam, // 학교를 관할하는 교육청
     }
 
-    meals, err := school.GetWeekMeal("2018.11.15", sm.Lunch)
+    meals, err := school.GetWeekMeal(sm.Timestamp(), sm.Lunch)
     if err != nil {
         panic(err)
     }
