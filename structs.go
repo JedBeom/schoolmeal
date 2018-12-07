@@ -7,6 +7,11 @@ type School struct {
 	Zone           string // 학교를 관할하는 교육청
 }
 
+type Meal struct {
+	Date    string
+	Content string
+}
+
 // GetWeekMeal 함수의 두번째 인자로 들어가는 mealtype에 사용하는 상수들입니다.
 const (
 	Breakfast = iota + 1 // 아침
