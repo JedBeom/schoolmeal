@@ -58,7 +58,7 @@ func (school School) GetWeekMeal(date string, mealtype int) (meals []Meal, err e
 	}
 
 	th := doc.Find("thead").Find("tr").FindAll("th")
-	for i, day := range th {
+	for i, day := range th[1:] {
 		meals[i].Date = day.Text()
 	}
 
