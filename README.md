@@ -30,7 +30,7 @@ func main() {
         panic(err)
     }
 
-    fmt.Println(meals[time.Wednesday])
+    fmt.Println(meals[time.Wednesday].Date, meals[time.Wednesday].Content)
 }
 ```
 
