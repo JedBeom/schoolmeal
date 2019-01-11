@@ -2,8 +2,8 @@ package schoolmeal
 
 import (
 	"crypto/tls"
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -37,13 +37,12 @@ func (school School) GetWeekMeal(date string, mealtype int) (meals []Meal, err e
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 
 	doc := soup.HTMLParse(string(bodyBytes))
-	NoMeal := doc.Find("thead").Find("td").Text()
-	if NoMeal == "자료가 없습니다." {
+	tr := doc.Find("tbody").FindAll("tr")[1]
+	if tr.Text() != "중식" {
 		err = errors.New("NoMeal")
 		return
 	}
-
-	td := doc.Find("tbody").FindAll("tr")[1].FindAll("td")
+	td := tr.FindAll("td")
 
 	for _, day := range td {
 		var menu []string
@@ -65,7 +64,6 @@ func (school School) GetWeekMeal(date string, mealtype int) (meals []Meal, err e
 	}
 
 	th := doc.Find("thead").Find("tr").FindAll("th")
-	fmt.Println(len(th))
 	for i, day := range th[1:] {
 		meals[i].Date = day.Text()
 	}
