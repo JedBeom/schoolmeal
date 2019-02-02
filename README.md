@@ -19,13 +19,13 @@ import (
 )
 
 func main() {
-    school := sm.School{
-        SchoolCode:     "Q100005451", // 학교 코드
-        SchoolKindCode: sm.Middle, // 학교 타입(유치원, 초, 중, 고)
-        Zone:           sm.Jeonnam, // 학교를 관할하는 교육청
-    }
 
-    meals, err := school.GetWeekMeal(sm.Timestamp(), sm.Lunch)
+	school, err := sm.Find(sm.Seoul, "서울대학교사범대학부설고등학교")
+	if err != nil {
+		panic(err)
+	}
+
+    meals, err := school.GetWeekMeal(sm.Timestamp(time.Now()), sm.Lunch)
     if err != nil {
         panic(err)
     }
@@ -33,5 +33,3 @@ func main() {
     fmt.Println(meals[time.Wednesday].Date, meals[time.Wednesday].Content)
 }
 ```
-
-`SchoolCode`는 [이 사이트](https://www.meatwatch.go.kr/biz/bm/sel/schoolListPopup.do)에서 얻으실 수 있습니다.
