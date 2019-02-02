@@ -2,8 +2,8 @@ package schoolmeal
 
 import (
 	"crypto/tls"
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
