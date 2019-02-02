@@ -66,7 +66,8 @@ func (school School) GetWeekMeal(date string, mealtype int) (meals []Meal, err e
 
 	th := doc.Find("thead").Find("tr").FindAll("th")
 	if len(th) < 2 {
-		err = errors.New("schoolmeal: Index out of range")
+		err = errors.New("Index out of range")
+		err = errors.Wrap(err, "schoolmeal")
 		return
 	}
 
