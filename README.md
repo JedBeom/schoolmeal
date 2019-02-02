@@ -20,10 +20,10 @@ import (
 
 func main() {
 
-	school, err := sm.Find(sm.Seoul, "서울대학교사범대학부설고등학교")
-	if err != nil {
-		panic(err)
-	}
+    school, err := sm.Find(sm.Seoul, "서울대학교사범대학부설고등학교")
+        if err != nil {
+            panic(err)
+        }
 
     meals, err := school.GetWeekMeal(sm.Timestamp(time.Now()), sm.Lunch)
     if err != nil {
