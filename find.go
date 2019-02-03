@@ -2,6 +2,7 @@ package schoolmeal
 
 import (
 	"io/ioutil"
+	"net/http"
 	"strconv"
 
 	"github.com/buger/jsonparser"
@@ -12,13 +13,22 @@ import (
 func Find(zone, schoolName string) (school School, err error) {
 	link := "https://par." + zone + ".go.kr/spr_ccm_cm01_100.do?kraOrgNm=" + schoolName
 
-	resp, err := client.Get(link)
+	req, err := http.NewRequest("GET", link, nil)
 	if err != nil {
+		err = errors.Wrap(err, "schoolmeal")
+		return
+	}
+	req.Header.Set("User-Agent", userAgent)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		err = errors.Wrap(err, "schoolmeal")
 		return
 	}
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		err = errors.Wrap(err, "schoolmeal")
 		return
 	}
 

@@ -11,9 +11,11 @@ import (
 func Timestamp(date time.Time) (stamp string) {
 	y, m, d := date.Date()
 
-	mStr := m.String()
+	mStr := ""
 	if m < 10 {
-		mStr = "0" + mStr
+		mStr = fmt.Sprintf("0%d", m)
+	} else {
+		mStr = strconv.Itoa(int(m))
 	}
 
 	format := "%d.%s"
