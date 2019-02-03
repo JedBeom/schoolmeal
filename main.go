@@ -24,10 +24,10 @@ func init() {
 }
 
 // GetWeekMeal 함수는 인자로 받는 날짜가 포함된 주의 급식이 담긴 string 슬라이스를 리턴합니다.
-func (school School) GetWeekMeal(date string, mealtype int) (meals []Meal, err error) {
+func (school School) GetWeekMeal(date string, mealType int) (meals []Meal, err error) {
 	originLink := "https://stu.%s.go.kr/sts_sci_md01_001.do?schulCode=%s&schulCrseScCode=%d&schulKndScCode=0%d&schMmealScCode=%d&schYmd=%s"
 
-	link := fmt.Sprintf(originLink, school.Zone, school.SchoolCode, school.SchoolKindCode, school.SchoolKindCode, mealtype, date)
+	link := fmt.Sprintf(originLink, school.Zone, school.SchoolCode, school.SchoolKindCode, school.SchoolKindCode, mealType, date)
 
 	resp, err := client.Get(link)
 	if err != nil {
