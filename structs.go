@@ -8,7 +8,8 @@ type School struct {
 	Zone string // 학교를 관할하는 교육청
 }
 
+// Meal 구조체는 급식 정보를 저장합니다.
 type Meal struct {
-	Date    string
-	Content string
+	Date    string // 2018.11.30 형태의 타임스탬프
+	Content string // 메뉴
 }
