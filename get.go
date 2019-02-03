@@ -3,10 +3,11 @@ package schoolmeal
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/anaskhan96/soup"
 )
@@ -24,10 +25,10 @@ func init() {
 }
 
 // GetWeekMeal 함수는 인자로 받는 날짜가 포함된 주의 급식이 담긴 string 슬라이스를 리턴합니다.
-func (school School) GetWeekMeal(date string, mealType int) (meals []Meal, err error) {
+func (school School) GetWeekMeal(date string, mealtype int) (meals []Meal, err error) {
 	originLink := "https://stu.%s.go.kr/sts_sci_md01_001.do?schulCode=%s&schulCrseScCode=%d&schulKndScCode=0%d&schMmealScCode=%d&schYmd=%s"
 
-	link := fmt.Sprintf(originLink, school.Zone, school.SchoolCode, school.SchoolKindCode, school.SchoolKindCode, mealType, date)
+	link := fmt.Sprintf(originLink, school.Zone, school.Code, school.Kind, school.Kind, mealtype, date)
 
 	resp, err := client.Get(link)
 	if err != nil {
@@ -35,6 +36,9 @@ func (school School) GetWeekMeal(date string, mealType int) (meals []Meal, err e
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
 
 	doc := soup.HTMLParse(string(bodyBytes))
 	NoMeal := doc.Find("thead").Find("td").Text()
