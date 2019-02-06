@@ -9,7 +9,7 @@ const (
 
 // School 구조체의 Code 필드에 사용할 수 있습니다.
 const (
-	Kindergarden = iota + 1 // 유치원
+	Kindergarten = iota + 1 // 유치원
 	Elementary              // 초등학교
 	Middle                  // 중학교
 	High                    // 고등학교

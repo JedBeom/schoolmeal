@@ -22,4 +22,9 @@ func TestTimestamp(t *testing.T) {
 	if stamp := Timestamp(date2); stamp != "2019.10.31" {
 		t.Error("Expected 2019.10.31 unexpected", stamp)
 	}
+
+	date3 := time.Date(2019, time.December, 4, 1, 4, 1, 123, tz)
+	if stamp := Timestamp(date3); stamp != "2019.12.04" {
+		t.Error("Expected 2019.12.04 unexpected", stamp)
+	}
 }
