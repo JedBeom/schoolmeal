@@ -3,9 +3,10 @@ package schoolmeal
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/pkg/errors"
 
 	"github.com/anaskhan96/soup"
 )
@@ -89,7 +90,7 @@ func (school School) GetWeekMeal(date string, mealType int) (meals []Meal, err e
 		}
 
 		// Remove last '\n'
-		if len(menu) > 2 {
+		if len(menu) > 1 {
 			menu = menu[:len(menu)-1]
 		}
 
