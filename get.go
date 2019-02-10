@@ -84,7 +84,7 @@ func (school School) GetWeekMeal(date string, mealType int) (meals []Meal, err e
 		// soup thinks menu strings as 'tags', so we should get children
 		for i, food := range day.Children() {
 			// i%2 != 0 -> <br>
-			if i%2 == 0 {
+			if i%2 == 0 && food.Pointer.Data != " " {
 				menu += food.Pointer.Data + "\n"
 			}
 		}
