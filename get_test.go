@@ -6,32 +6,39 @@ import (
 )
 
 func TestSchool_GetWeekMeal(t *testing.T) {
-	school, err := Find(Seoul, "서울대학교사범대학부설고등학교")
+	school, err := Find(Jeonnam, "광양제철고등학교")
 	if err != nil {
 		t.Error("Unexpected", err)
 		t.Failed()
 	}
 
-	meals, err := school.GetWeekMeal("2018.11.30", Lunch)
+	meals, err := school.GetWeekMeal("2020.08.08", Lunch)
 	if err != nil {
 		t.Error("Unexpected", err)
 		t.Failed()
 	}
 
-	meal := meals[time.Friday]
+	meal := meals[time.Saturday]
+
 	menu := `쌀밥
-바지락된장찌개5.6.13.18.
-소버섯불고기5.6.13.16.
-치커리유자무침5.6.13.
-깍두기9.13.
-피칸파이1.2.5.6.13.
-김치전5.6.9.13.`
+미니냉면1.3.5.6.13.16.
+모듬떡볶이1.2.5.6.10.12.13.15.16.18.
+잡채김말이튀김1.5.6.16.18.
+찐순대6.10.
+숙주나물무침1.5.6.13.
+배추김치9.13.`
 	if meal.Content != menu {
 		t.Error("Expected", menu, "Unexpected", meal.Content)
 	}
 
-	date := "2018.11.30(금)"
-	if meal.Date != date {
-		t.Error("Expected", date, "Unexpected", meal.Date)
+	dateString := "2020.08.08(토)"
+	if meal.DateString != dateString {
+		t.Error("Expected", dateString, "Unexpected", meal.DateString)
 	}
+
+	people := 409
+	if meal.People != people {
+		t.Error("Expected", people, "Unexpected", meal.People)
+	}
+
 }

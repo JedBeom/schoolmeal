@@ -1,118 +1,97 @@
 package schoolmeal
 
 import (
-	"crypto/tls"
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/anaskhan96/soup"
+	"github.com/buger/jsonparser"
 )
 
 var (
-	client    *http.Client
-	userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) GoParser/0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36"
+	client *http.Client
 )
 
 func init() {
-	trans := &http.Transport{
-		// Korean government sites don't have secured certifications
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	client = &http.Client{Transport: trans}
+	client = &http.Client{}
 }
 
-// GetWeekMeal 함수는 인자로 받는 날짜가 포함된 주의 급식이 담긴 string 슬라이스를 리턴합니다.
-func (school School) GetWeekMeal(date string, mealType int) (meals []Meal, err error) {
-	originLink := "https://stu.%s.go.kr/sts_sci_md01_001.do?schulCode=%s&schulCrseScCode=%d&schulKndScCode=0%d&schMmealScCode=%d&schYmd=%s"
-	// https://stu.sen.go.kr/sts_sci_md01_001.do?schulCode=A000003561&schulCrseScCode=4&schulKndScCode=04&schMmealScCode=2&schYmd=2018.11.30
-
-	link := fmt.Sprintf(originLink, school.Zone, school.Code, school.Kind, school.Kind, mealType, date)
-
-	// Make new request
-	req, err := http.NewRequest("GET", link, nil)
+func (s School) GetDayMeal(date string, mealType int) (m Meal, err error) {
+	weekMeals, err := s.GetWeekMeal(date, mealType)
 	if err != nil {
-		err = errors.Wrap(err, "schoolmeal")
-		return
-	}
-	// Set user-agent for Chrome
-	req.Header.Set("User-Agent", userAgent)
-
-	// Get body
-	resp, err := client.Do(req)
-	if err != nil {
-		err = errors.Wrap(err, "schoolmeal")
 		return
 	}
 
-	// Convert body to bytes
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	parse := parseTime(date)
+	m = weekMeals[parse.Weekday()]
+	return
+}
+
+// GetWeekMeal 함수는 인자로 받는 날짜가 포함된 주의 급식이 담긴 []Meal{}을 리턴합니다.
+func (s School) GetWeekMeal(date string, mealType int) (meals []Meal, err error) {
+	reqFormat := `{"schulCode": "%s", "schulCrseScCode": %d, "schulMmealScCode": %d, "schYmd": "%s"}`
+	reqJSON := []byte(fmt.Sprintf(reqFormat, s.Code, s.Kind, mealType, date))
+
+	// POST
+	req, err := http.NewRequest("POST", makeURL(s.Zone, linkMealWeekly), bytes.NewBuffer(reqJSON))
 	if err != nil {
-		err = errors.Wrap(err, "schoolmeal")
 		return
 	}
 
-	// Parse html
-	doc := soup.HTMLParse(string(bodyBytes))
-	// <thead>
-	thead := doc.Find("thead")
-	// Get <td>
-	mealExistTD := thead.Find("td")
-	// Prevent runtime pointer error
-	if mealExistTD.Pointer != nil {
-		if mealExistTD.Text() == "자료가 없습니다." {
-			err = errors.New("schoolmeal: Can't get meals; Might be wrong arguments?")
+	req.Header.Set("Content-Type", "application/json")
+
+	// if cookie expires, reload session
+	if s.sess == nil || s.sess.Expires.Sub(time.Now()) <= 0 {
+		err = s.reloadSession()
+		if err != nil {
 			return
 		}
 	}
+	req.AddCookie(s.sess)
 
-	// <td>
-	tds := doc.FindAll("td")
-	// length should be greater than 14
-	if len(tds) < 14 {
-		err = errors.New("schoolmeal: length of meals is too short")
+	// do request
+	res, err := client.Do(req)
+	if err != nil {
 		return
 	}
 
-	// tds[0:7] are for the number of people who eat
-	for _, day := range tds[7:] {
-		var menu string
-
-		// soup thinks menu strings as 'tags', so we should get children
-		for i, food := range day.Children() {
-
-			// Avoid invalid pointer error
-			if food.Pointer == nil {
-				continue
-			}
-			// i%2 != 0 -> <br>
-			if i%2 == 0 && food.Pointer.Data != " " {
-				menu += food.Pointer.Data + "\n"
-			}
-		}
-
-		// Remove last '\n'
-		if len(menu) > 1 {
-			menu = menu[:len(menu)-1]
-		}
-
-		meal := Meal{Content: menu}
-		meals = append(meals, meal)
-	}
-
-	th := thead.FindAll("th")
-	if len(th) < 2 {
-		err = errors.New("schoolmeal: Index out of range")
+	// Decode body -> byte
+	doc, err := ioutil.ReadAll(res.Body)
+	if err != nil {
 		return
 	}
 
-	for i, day := range th[1:] {
-		meals[i].Date = day.Text()
+	// get weekDietList json
+	docDiet, _, _, err := jsonparser.Get(doc, "resultSVO", "weekDietList")
+	if err != nil {
+		return
 	}
+
+	rds := make([]resultDiet, 0, 3)
+	if err = json.Unmarshal(docDiet, &rds); err != nil {
+		return
+	}
+
+	if len(rds) < 3 {
+		err = errors.New("schoolmeal: no diet in this week")
+		return
+	}
+
+	// rds[0] == DateString
+	// rds[1] == People
+	// rds[2] == Content
+	meals = make([]Meal, 7, 7)
+	meals[0] = rdToMeal(rds[0].Sun, rds[1].Sun, rds[2].Sun, mealType)
+	meals[1] = rdToMeal(rds[0].Mon, rds[1].Mon, rds[2].Mon, mealType)
+	meals[2] = rdToMeal(rds[0].Tue, rds[1].Tue, rds[2].Tue, mealType)
+	meals[3] = rdToMeal(rds[0].Wed, rds[1].Wed, rds[2].Wed, mealType)
+	meals[4] = rdToMeal(rds[0].Thu, rds[1].Thu, rds[2].Thu, mealType)
+	meals[5] = rdToMeal(rds[0].Fri, rds[1].Fri, rds[2].Fri, mealType)
+	meals[6] = rdToMeal(rds[0].Sat, rds[1].Sat, rds[2].Sat, mealType)
 
 	return
-
 }

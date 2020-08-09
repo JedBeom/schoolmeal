@@ -36,3 +36,13 @@ const (
 	Geyongnam = "gne" // 경상남도교육청
 	Jeju      = "jje" // 제주특별자치도교육청
 )
+
+const (
+	linkMainPage    = "edusys.jsp?page=sts_m40000"
+	linkMealMonthly = "sts_sci_md00_001.ws"
+	linkMealWeekly  = "sts_sci_md01_001.ws"
+)
+
+const (
+	sessionName = "JSESSIONID"
+)

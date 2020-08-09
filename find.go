@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"errors"
+
 	"github.com/buger/jsonparser"
-	"github.com/pkg/errors"
 )
 
 // Find 함수는 학교를 찾아 School을 리턴합니다. 여러 개의 학교가 찾아질 경우 첫번째 학교를 사용합니다.
@@ -15,20 +16,16 @@ func Find(zone, schoolName string) (school School, err error) {
 
 	req, err := http.NewRequest("GET", link, nil)
 	if err != nil {
-		err = errors.Wrap(err, "schoolmeal")
 		return
 	}
-	req.Header.Set("User-Agent", userAgent)
 
 	resp, err := client.Do(req)
 	if err != nil {
-		err = errors.Wrap(err, "schoolmeal")
 		return
 	}
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		err = errors.Wrap(err, "schoolmeal")
 		return
 	}
 
