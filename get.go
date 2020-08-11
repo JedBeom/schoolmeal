@@ -33,7 +33,7 @@ func (s School) GetDayMeal(date string, mealType int) (m Meal, err error) {
 
 // GetWeekMeal 함수는 인자로 받는 날짜가 포함된 주의 급식이 담긴 []Meal{}을 리턴합니다.
 func (s School) GetWeekMeal(date string, mealType int) (meals []Meal, err error) {
-	reqFormat := `{"schulCode": "%s", "schulCrseScCode": %d, "schulMmealScCode": %d, "schYmd": "%s"}`
+	reqFormat := `{"schulCode": "%s", "schulCrseScCode": %d, "schMmealScCode": %d, "schYmd": "%s"}`
 	reqJSON := []byte(fmt.Sprintf(reqFormat, s.Code, s.Kind, mealType, date))
 
 	// POST
