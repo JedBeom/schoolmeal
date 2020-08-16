@@ -43,7 +43,7 @@ func makeURL(zone, link string) string {
 func rdToMeal(date, peopleStr, content string, t int) (m Meal) {
 	m.DateString = date
 	m.Date = parseTime(date)
-	if content != "" {
+	if content != "" && content != " " {
 		m.Content = strings.Replace(content, "<br />", "\n", -1)
 		m.Content = m.Content[:len(m.Content)-len("\n")]
 	}
