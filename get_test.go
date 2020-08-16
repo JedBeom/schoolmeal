@@ -42,3 +42,22 @@ func TestSchool_GetWeekMeal(t *testing.T) {
 	}
 
 }
+
+func TestSchool_GetDayMeal(t *testing.T) {
+	school, err := Find(Jeonnam, "광양제철고등학교")
+	if err != nil {
+		t.Error("Unexpected", err)
+		t.Failed()
+	}
+
+	m, err := school.GetDayMeal("2020.08.20", Lunch)
+	if err != nil {
+		t.Error("Unexpected", err)
+		t.Failed()
+	}
+
+	dateString := "2020.08.20(목)"
+	if m.DateString != dateString {
+		t.Error("Expected", dateString, "Unexpected", m.DateString)
+	}
+}

@@ -26,5 +26,5 @@ type Meal struct {
 }
 
 type resultDiet struct {
-	Sun, Mon, Tue, Wed, Thu, Fri, Sat string
+	Sun, Mon, Tue, Wed, The, Fri, Sat string
 }

@@ -89,7 +89,7 @@ func (s School) GetWeekMeal(date string, mealType int) (meals []Meal, err error)
 	meals[1] = rdToMeal(rds[0].Mon, rds[1].Mon, rds[2].Mon, mealType)
 	meals[2] = rdToMeal(rds[0].Tue, rds[1].Tue, rds[2].Tue, mealType)
 	meals[3] = rdToMeal(rds[0].Wed, rds[1].Wed, rds[2].Wed, mealType)
-	meals[4] = rdToMeal(rds[0].Thu, rds[1].Thu, rds[2].Thu, mealType)
+	meals[4] = rdToMeal(rds[0].The, rds[1].The, rds[2].The, mealType)
 	meals[5] = rdToMeal(rds[0].Fri, rds[1].Fri, rds[2].Fri, mealType)
 	meals[6] = rdToMeal(rds[0].Sat, rds[1].Sat, rds[2].Sat, mealType)
 
