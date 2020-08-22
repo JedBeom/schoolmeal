@@ -71,7 +71,7 @@ func rdToMealMonth(year, month int, rd string) []Meal {
 		hangul := weekdayHangul[ms[ti].Date.Weekday()]
 		ms[ti].DateString += "(" + hangul + ")"
 
-		if li[start] != t {
+		if len(li) == start || li[start] != t {
 			continue
 		}
 		start++
@@ -80,9 +80,6 @@ func rdToMealMonth(year, month int, rd string) []Meal {
 			end++
 		}
 		ms[ti].Content = strings.Join(li[start:end], "\n")
-		if end == len(li) {
-			break
-		}
 		start = end
 	}
 
