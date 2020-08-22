@@ -12,7 +12,11 @@ var (
 )
 
 func init() {
-	seoul, _ = time.LoadLocation("Asia/Seoul")
+	var err error
+	seoul, err = time.LoadLocation("Asia/Seoul")
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Timestamp 함수는 GetWeekMeal 함수의 첫번째 인자로 쓰기 좋습니다.
@@ -20,19 +24,8 @@ func init() {
 func Timestamp(date time.Time) (stamp string) {
 	y, m, d := date.Date()
 
-	mStr := ""
-	if m < 10 {
-		mStr = fmt.Sprintf("0%d", m)
-	} else {
-		mStr = strconv.Itoa(int(m))
-	}
-
-	format := "%d.%s"
-	if d < 10 {
-		stamp = fmt.Sprintf(format+".%s", y, mStr, "0"+strconv.Itoa(d))
-	} else {
-		stamp = fmt.Sprintf(format+".%d", y, mStr, d)
-	}
+	format := "%d.%02d.%02d"
+	stamp = fmt.Sprintf(format, y, m, d)
 	return
 }
 
@@ -40,7 +33,7 @@ func makeURL(zone, link string) string {
 	return "https://stu." + zone + ".go.kr/" + link
 }
 
-func rdToMeal(date, peopleStr, content string, t int) (m Meal) {
+func rdToMealWeek(date, peopleStr, content string, t int) (m Meal) {
 	m.DateString = date
 	m.Date = parseTime(date)
 	if content != "" && content != " " {
@@ -54,6 +47,58 @@ func rdToMeal(date, peopleStr, content string, t int) (m Meal) {
 	return
 }
 
+func rdToMealMonth(year, month int, rd string) []Meal {
+	if rd == "" {
+		return nil
+	}
+
+	li := strings.Split(rd, "<br />")
+	day, _ := strconv.Atoi(li[0])
+
+	if len(li) == 1 {
+		return nil
+	}
+
+	start := 1
+	end := 0
+	ms := make([]Meal, 3, 3)
+
+	mealType := []string{"[조식]", "[중식]", "[석식]"}
+	for ti, t := range mealType {
+		ms[ti].Type = ti + 1
+		ms[ti].DateString = fmt.Sprintf("%d.%02d.%02d", year, month, day)
+		ms[ti].Date = parseTime(ms[ti].DateString)
+		hangul := weekdayHangul[ms[ti].Date.Weekday()]
+		ms[ti].DateString += "(" + hangul + ")"
+
+		if li[start] != t {
+			continue
+		}
+		start++
+		end = start
+		for end < len(li) && !in(li[end], mealType) {
+			end++
+		}
+		ms[ti].Content = strings.Join(li[start:end], "\n")
+		if end == len(li) {
+			break
+		}
+		start = end
+	}
+
+	return ms
+}
+
+func in(s string, l []string) bool {
+	for _, r := range l {
+		if s == r {
+			return true
+		}
+	}
+
+	return false
+}
+
 func parseTime(t string) time.Time {
 	if len(t) < 10 {
 		return time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
@@ -62,4 +107,12 @@ func parseTime(t string) time.Time {
 	m, _ := strconv.Atoi(t[5:7])
 	d, _ := strconv.Atoi(t[8:10])
 	return time.Date(y, time.Month(m), d, 0, 0, 0, 0, seoul)
+}
+
+func appendIfNotNil(mm *[][]Meal, m []Meal) {
+	if m == nil {
+		return
+	}
+
+	*mm = append(*mm, m)
 }

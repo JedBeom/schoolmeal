@@ -1,5 +1,5 @@
 # Schoolmeal
-[![GoDoc](https://godoc.org/github.com/JedBeom/schoolmeal?status.svg)](https://godoc.org/github.com/JedBeom/schoolmeal)
+[![GoDoc](https://godoc.org/github.com/JedBeom/schoolmeal?status.svg)](https://pkg.go.dev/github.com/JedBeom/schoolmeal)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Jedbeom/schoolmeal)](https://goreportcard.com/report/github.com/Jedbeom/schoolmeal)
 
 ```bash
@@ -38,4 +38,4 @@ func main() {
 }
 ```
 
-더 많은 정보는 [godoc](https://godoc.org/github.com/JedBeom/schoolmeal)을 참고하세요.
+더 많은 정보는 [godoc](https://pkg.go.dev/github.com/JedBeom/schoolmeal)을 참고하세요.
