@@ -48,16 +48,12 @@ func rdToMealWeek(date, peopleStr, content string, t int) (m Meal) {
 }
 
 func rdToMealMonth(year, month int, rd string) []Meal {
-	if rd == "" {
+	if rd == "" || rd == " " {
 		return nil
 	}
 
 	li := strings.Split(rd, "<br />")
 	day, _ := strconv.Atoi(li[0])
-
-	if len(li) == 1 {
-		return nil
-	}
 
 	start := 1
 	end := 0
