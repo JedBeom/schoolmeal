@@ -1,7 +1,11 @@
 package schoolmeal
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -82,6 +86,55 @@ func rdToMealMonth(year, month int, rd string) []Meal {
 	return ms
 }
 
+func eventToSchedule(event string) (sches []Schedule, err error) {
+	if len(event) == 0 || event == " " {
+		err = errors.New("event empty")
+		return
+	}
+	events := strings.Split(event, "|")
+	for _, e := range events {
+		fields := strings.Split(e, ":")
+		if len(fields) != 4 {
+			err = errors.New("event field not enough")
+			return
+		}
+
+		sche := Schedule{}
+		sche.DateString = fields[1]
+		sche.Name = fields[2]
+		sche.Type, err = strconv.Atoi(fields[3])
+		if err != nil {
+			return
+		}
+
+		if strings.HasSuffix(sche.Name, "(1학년)") {
+			sche.Grade1 = true
+		} else if strings.HasSuffix(sche.Name, "(2학년)") {
+			sche.Grade2 = true
+		} else if strings.HasSuffix(sche.Name, "(3학년)") {
+			sche.Grade3 = true
+		} else if strings.Contains(sche.Name, "(1, 2학년)") {
+			sche.Grade1 = true
+			sche.Grade2 = true
+		} else if strings.Contains(sche.Name, "(2, 3학년)") {
+			sche.Grade2 = true
+			sche.Grade3 = true
+		} else if strings.Contains(sche.Name, "(1, 3학년)") {
+			sche.Grade1 = true
+			sche.Grade3 = true
+		}
+
+		y, _ := strconv.Atoi(fields[1][0:4])
+		m, _ := strconv.Atoi(fields[1][4:6])
+		d, _ := strconv.Atoi(fields[1][6:8])
+		sche.Date = time.Date(y, time.Month(m), d, 0, 0, 0, 0, seoul)
+
+		sches = append(sches, sche)
+	}
+
+	return
+}
+
 func in(s string, l []string) bool {
 	for _, r := range l {
 		if s == r {
@@ -108,4 +161,32 @@ func appendIfNotNil(mm *[][]Meal, m []Meal) {
 	}
 
 	*mm = append(*mm, m)
+}
+
+func post(s School, url string, reqJSON []byte) (doc []byte, err error) {
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqJSON))
+	if err != nil {
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	// if cookie expires, reload session
+	if s.sess == nil || s.sess.Expires.Sub(time.Now()) <= 0 {
+		err = s.reloadSession()
+		if err != nil {
+			return
+		}
+	}
+	req.AddCookie(s.sess)
+
+	// do request
+	res, err := client.Do(req)
+	if err != nil {
+		return
+	}
+
+	// Decode body -> byte
+	doc, err = ioutil.ReadAll(res.Body)
+	return
 }

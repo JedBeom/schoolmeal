@@ -1,13 +1,10 @@
 package schoolmeal
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"time"
 
 	"github.com/buger/jsonparser"
 )
@@ -29,34 +26,6 @@ func (s School) GetDayMeal(date string, mealType int) (m Meal, err error) {
 
 	parse := parseTime(date)
 	m = weekMeals[parse.Weekday()]
-	return
-}
-
-func post(s School, url string, reqJSON []byte) (doc []byte, err error) {
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqJSON))
-	if err != nil {
-		return
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-
-	// if cookie expires, reload session
-	if s.sess == nil || s.sess.Expires.Sub(time.Now()) <= 0 {
-		err = s.reloadSession()
-		if err != nil {
-			return
-		}
-	}
-	req.AddCookie(s.sess)
-
-	// do request
-	res, err := client.Do(req)
-	if err != nil {
-		return
-	}
-
-	// Decode body -> byte
-	doc, err = ioutil.ReadAll(res.Body)
 	return
 }
 

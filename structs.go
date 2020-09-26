@@ -25,6 +25,15 @@ type Meal struct {
 	Content string // 메뉴
 }
 
+type Schedule struct {
+	DateString string
+	Date       time.Time
+	Name       string
+	Type       int // 0: 없음, 1: 공휴일, 2: 휴업일
+
+	Grade1, Grade2, Grade3 bool
+}
+
 type resultDiet struct {
 	Sun, Mon, Tue, Wed, The, Fri, Sat string
 }

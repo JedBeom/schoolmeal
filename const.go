@@ -41,6 +41,8 @@ const (
 	linkMainPage    = "edusys.jsp?page=sts_m40000"
 	linkMealMonthly = "sts_sci_md00_001.ws"
 	linkMealWeekly  = "sts_sci_md01_001.ws"
+
+	linkScheduleMonthly = "sts_sci_sf01_001.ws"
 )
 
 const (
