@@ -107,13 +107,7 @@ func eventToSchedule(event string) (sches []Schedule, err error) {
 			return
 		}
 
-		if strings.Contains(sche.Name, "1학년") || strings.Contains(sche.Name, "/1") {
-			sche.Grade1 = true
-		} else if strings.Contains(sche.Name, "2학년") || strings.Contains(sche.Name, "/2") {
-			sche.Grade2 = true
-		} else if strings.Contains(sche.Name, "3학년") || strings.Contains(sche.Name, "/3") {
-			sche.Grade3 = true
-		} else if strings.Contains(sche.Name, "1, 2학년") || strings.Contains(sche.Name, "1,2학년") {
+		if strings.Contains(sche.Name, "1, 2학년") || strings.Contains(sche.Name, "1,2학년") {
 			sche.Grade1 = true
 			sche.Grade2 = true
 		} else if strings.Contains(sche.Name, "2, 3학년") || strings.Contains(sche.Name, "2,3학년") {
@@ -121,6 +115,12 @@ func eventToSchedule(event string) (sches []Schedule, err error) {
 			sche.Grade3 = true
 		} else if strings.Contains(sche.Name, "1, 3학년") || strings.Contains(sche.Name, "1,3학년") {
 			sche.Grade1 = true
+			sche.Grade3 = true
+		} else if strings.Contains(sche.Name, "1학년") || strings.Contains(sche.Name, "/1") {
+			sche.Grade1 = true
+		} else if strings.Contains(sche.Name, "2학년") || strings.Contains(sche.Name, "/2") {
+			sche.Grade2 = true
+		} else if strings.Contains(sche.Name, "3학년") || strings.Contains(sche.Name, "/3") {
 			sche.Grade3 = true
 		}
 
