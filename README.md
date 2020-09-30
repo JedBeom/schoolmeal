@@ -6,7 +6,7 @@
 go get -u github.com/JedBeom/schoolmeal
 ```
 
-교육청 페이지를 크롤링해 학교 급식을 얻어올 수 있는 Golang 패키지입니다.
+교육청 API로 학교 급식과 학사 일정을 가져오는 Golang 패키지입니다.
 
 ## Example
 
